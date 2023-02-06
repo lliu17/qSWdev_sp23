@@ -101,8 +101,6 @@ namespace Lab2 {
     /// register is in a combination of all possible measurement outcomes, and
     /// each superposition term has an equal amplitude to the others.
     operation Exercise3 (register : Qubit[]) : Unit {
-        // TODO
-        // fail "Not implemented.";
         ApplyToEach(H, register);
     }
 
@@ -126,22 +124,9 @@ namespace Lab2 {
     /// state and tests your understanding of using integers for register
     /// values.
     operation Exercise4 (register : Qubit[]) : Unit {
-        // TODO
-        // fail "Not implemented.";
-        Message($">>> Original: {register}");
-        // for i in register {
-        //     Message($"{i}, ");
-        // }
-        // Message($">>> length = {Length(register)}");
+        // Message($">>> Original: {register}");
         let length = Length(register) - 1;
         Z(register[length]);
-        // for i in 0 .. length {
-        //     // Message($"outside i = {i}");
-        //     // if (i % 2 == 0) {
-        //         // Message($"i = {i}");
-        //     Controlled Z(register[length], register[i]);
-        //     // }
-        // }
-        Message($"Flipped: {register}");
+        // Message($"Flipped: {register}");
     }
 }
