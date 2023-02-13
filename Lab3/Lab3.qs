@@ -79,10 +79,10 @@ namespace Lab3 {
         let len = Length(register) - 1;
         if (len > 0) {
             let lenHalf = len / 2;
-            Message($"len (last idx) = {len}, lenhalf = {lenHalf}");
+            // Message($"len (last idx) = {len}, lenhalf = {lenHalf}");
             for i in 0 .. lenHalf {
                 if (i != len - i) {
-                    Message($"i = {i}, lenhalf = {lenHalf}");
+                    // Message($"i = {i}, lenhalf = {lenHalf}");
                     SWAP(register[i], register[len - i]);
                 }
             }
@@ -309,7 +309,7 @@ namespace Lab3 {
         // Rz(PI() / 6.0, register[0]);
         H(register[0]);
 
-        DumpRegister($"dump", register);
+        // DumpRegister($"dump", register);
     }
 
 
@@ -370,8 +370,55 @@ namespace Lab3 {
     /// faster than classical computers once we get to quantum algorithms, but
     /// this is a good first hint.
     operation Challenge3 (register : Qubit[]) : Unit {
-        // TODO
-        fail "Not implemented.";
+        // let deg = PI() / 4.0;
+        // Rx(deg, register[0]);
+        
+        // H(register[0]);
+        // H(register[1]);
+        // H(register[2]);
+        // use helper1 = Qubit[3];
+        
+        // // tangle helper bit 0 with 000
+        // X(register[0]);
+        // X(register[1]);
+        // X(register[2]);
+        // Controlled X(register[0..2], helper1[0]);
+        // X(register[0]);
+        // X(register[1]);
+        // X(register[2]);
+
+
+        // // tangle helper bit 1 with 100
+        // X(register[1]);
+        // X(register[2]);
+        // Controlled X(register[0..2], helper1[1]);
+        // X(register[1]);
+        // X(register[2]);
+
+        // H(helper1[2]);
+
+        // CNOT(helper1[1], register[1]);   // 000 -> 010
+        // CNOT(helper1[0], register[1]);   // 100 -> 110
+
+        // use helper2 = Qubit[3];
+        // Controlled X(register[0..2], helper2[0]);
+        
+        // X(register[1]);
+        // Controlled Z(register[0..2], helper2[1]);
+        // X(register[1]);
+        
+        // X(register[2]);
+        // Controlled Z(register[0..2], helper2[2]);
+        // X(register[2]);
+
+        // Controlled Z(helper2[0..0], register[0]);
+        // Controlled Z(helper2[1..1], register[0]);
+        // Controlled Z(helper2[2..2], register[0]);
+
+        H(register[0]);
+        CNOT(register[0], register[1]);
+
+        DumpRegister($"dump2", register);
     }
 
 
