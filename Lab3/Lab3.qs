@@ -373,33 +373,40 @@ namespace Lab3 {
         // let deg = PI() / 4.0;
         // Rx(deg, register[0]);
         
-        // H(register[0]);
-        // H(register[1]);
-        // H(register[2]);
-        // use helper1 = Qubit[3];
+        H(register[0]);
+        H(register[1]);
+        H(register[2]);
         
-        // // tangle helper bit 0 with 000
-        // X(register[0]);
-        // X(register[1]);
-        // X(register[2]);
-        // Controlled X(register[0..2], helper1[0]);
-        // X(register[0]);
-        // X(register[1]);
-        // X(register[2]);
+        use helper1 = Qubit[3];
 
-
-        // // tangle helper bit 1 with 100
-        // X(register[1]);
-        // X(register[2]);
-        // Controlled X(register[0..2], helper1[1]);
-        // X(register[1]);
-        // X(register[2]);
-
+        // tangle helper bit 0 with 000
+        X(register[0]);
+        X(register[1]);
+        X(register[2]);
+        Controlled X(register[0..2], helper1[0]);
+        X(register[2]);
+        X(register[1]);
+        X(register[0]);
+ 
         // H(helper1[2]);
 
-        // CNOT(helper1[1], register[1]);   // 000 -> 010
-        // CNOT(helper1[0], register[1]);   // 100 -> 110
+        // tangle helper bit 1 with 100
+        X(register[1]);
+        X(register[2]);
+        Controlled X(register[0..2], helper1[1]);
+        X(register[1]);
+        X(register[2]);
 
+        CNOT(helper1[0], register[1]);   // 000 -> 010
+        CNOT(helper1[1], register[1]);   // 100 -> 110
+        
+        
+       
+        
+        DumpMachine($"dump", register);
+        // DumpRegister($"dump", register);
+        ResetAll(helper1);
+        
         // use helper2 = Qubit[3];
         // Controlled X(register[0..2], helper2[0]);
         
@@ -415,12 +422,22 @@ namespace Lab3 {
         // Controlled Z(helper2[1..1], register[0]);
         // Controlled Z(helper2[2..2], register[0]);
 
-        H(register[0]);
-        CNOT(register[0], register[1]);
+        // DumpMachine($"dump2", register);
+        
+        // H(register[0]);
+        // CNOT(register[0], register[1]);
+        
+        // ResetAll(helper2);
 
-        DumpRegister($"dump2", register);
     }
 
+    operation learn (register : Qubit[]) : Unit {
+        H(register[0]);
+        use helper = Qubit();
+        CNOT(register[0], helper);
+        CNOT(helper, register[0]);
+        // DumpMachine($"Learning", register);
+    }
 
     /// # Summary
     /// This problem is the same as Challenge 3, but now you must construct a

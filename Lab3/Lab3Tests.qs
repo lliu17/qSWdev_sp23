@@ -183,80 +183,92 @@ namespace Lab3 {
     }
 
 
+    // @Test("QuantumSimulator")
+    // operation Challenge1Test () : Unit {
+    //     use qubits = Qubit[2];
+
+    //     Message($"dump reg");
+    //     DumpRegister((), qubits);
+
+    //     Challenge1(qubits);
+
+    //     X(qubits[0]);
+    //     Controlled H([qubits[0]], qubits[1]);
+    //     X(qubits[0]);
+
+    //     let desiredProbability = 2.0 / 3.0;
+    //     let angle = 2.0 * ArcCos(Sqrt(desiredProbability));
+    //     Ry(-angle, qubits[0]);
+
+    //     AssertAllZero(qubits);
+    // }
+
+
+    // @Test("QuantumSimulator")
+    // operation Challenge2Test () : Unit {
+    //     use qubits = Qubit[3];
+
+    //     Challenge2(qubits);
+
+    //     X(qubits[0]);
+    //     CNOT(qubits[0], qubits[2]);
+    //     CNOT(qubits[1], qubits[2]);
+    //     Controlled H([qubits[0]], qubits[1]);
+    //     X(qubits[0]);
+
+    //     let desiredProbability = 2.0 / 3.0;
+    //     let angle = 2.0 * ArcCos(Sqrt(desiredProbability));
+    //     Ry(-angle, qubits[0]);
+
+    //     AssertAllZero(qubits);
+    // }
+
+
+    // @Test("QuantumSimulator")
+    // operation Challenge3Test () : Unit {
+    //     use qubits = Qubit[3];
+
+    //     Challenge3(qubits);
+    //     // ResetAll(qubits);
+    //     DumpMachine($"dump_test", qubits);
+
+    //     X(qubits[2]);
+    //     CNOT(qubits[2], qubits[1]);
+    //     X(qubits[2]);
+    //     Controlled H([qubits[2]], qubits[1]);
+    //     H(qubits[2]);
+    //     H(qubits[0]);
+    //     X(qubits[0]);
+
+        
+
+    //     AssertAllZero(qubits);
+    // }
+
     @Test("QuantumSimulator")
-    operation Challenge1Test () : Unit {
-        use qubits = Qubit[2];
-
-        Message($"dump reg");
-        DumpRegister((), qubits);
-
-        Challenge1(qubits);
-
+    operation learnTest () : Unit {
+        use qubits = Qubit[1];
+        learn(qubits);
+        DumpMachine($"Learning", qubits);
         X(qubits[0]);
-        Controlled H([qubits[0]], qubits[1]);
-        X(qubits[0]);
-
-        let desiredProbability = 2.0 / 3.0;
-        let angle = 2.0 * ArcCos(Sqrt(desiredProbability));
-        Ry(-angle, qubits[0]);
-
         AssertAllZero(qubits);
     }
 
+    // @Test("QuantumSimulator")
+    // operation Challenge4Test () : Unit {
+    //     use qubits = Qubit[3];
 
-    @Test("QuantumSimulator")
-    operation Challenge2Test () : Unit {
-        use qubits = Qubit[3];
+    //     Challenge4(qubits);
 
-        Challenge2(qubits);
+    //     CCNOT(qubits[2], qubits[0], qubits[1]);
+    //     Controlled H([qubits[2]], qubits[1]);
+    //     Controlled X([qubits[2]], qubits[1]);
+    //     H(qubits[0]);
+    //     X(qubits[2]);
+    //     CNOT(qubits[2], qubits[0]);
+    //     X(qubits[2]);
+    //     H(qubits[2]);
 
-        X(qubits[0]);
-        CNOT(qubits[0], qubits[2]);
-        CNOT(qubits[1], qubits[2]);
-        Controlled H([qubits[0]], qubits[1]);
-        X(qubits[0]);
-
-        let desiredProbability = 2.0 / 3.0;
-        let angle = 2.0 * ArcCos(Sqrt(desiredProbability));
-        Ry(-angle, qubits[0]);
-
-        AssertAllZero(qubits);
-    }
-
-
-    @Test("QuantumSimulator")
-    operation Challenge3Test () : Unit {
-        use qubits = Qubit[3];
-
-        Challenge3(qubits);
-
-        X(qubits[2]);
-        CNOT(qubits[2], qubits[1]);
-        X(qubits[2]);
-        Controlled H([qubits[2]], qubits[1]);
-        H(qubits[2]);
-        H(qubits[0]);
-        X(qubits[0]);
-
-        AssertAllZero(qubits);
-    }
-
-
-    @Test("QuantumSimulator")
-    operation Challenge4Test () : Unit {
-        use qubits = Qubit[3];
-
-        Challenge4(qubits);
-
-        CCNOT(qubits[2], qubits[0], qubits[1]);
-        Controlled H([qubits[2]], qubits[1]);
-        Controlled X([qubits[2]], qubits[1]);
-        H(qubits[0]);
-        X(qubits[2]);
-        CNOT(qubits[2], qubits[0]);
-        X(qubits[2]);
-        H(qubits[2]);
-
-        AssertAllZero(qubits);
-    }
+    //     AssertAllZero(qubits);
+    // }
 }
