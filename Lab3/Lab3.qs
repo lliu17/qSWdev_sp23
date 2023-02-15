@@ -303,13 +303,19 @@ namespace Lab3 {
         // // CNOT(register[0], register[1]);
         // // H(register[0]);
         // H(register[0]);
-        H(register[0]);                             // 1/√2*|00> + 1/√2*|10>
-        Controlled H(register[0..0], register[1]);  // 1/√2*|00> + 1/2*|10> + 1/2*|11>
-        CNOT(register[1], register[0]);             // 1/√2*|00> + 1/2*|10> + 1/2*|01>
-        // Rz(PI() / 6.0, register[0]);
-        H(register[0]);
+        // H(register[0]);                             // 1/√2*|00> + 1/√2*|10>
+        // Controlled H(register[0..0], register[1]);  // 1/√2*|00> + 1/2*|10> + 1/2*|11>
+        // CNOT(register[1], register[0]);             // 1/√2*|00> + 1/2*|10> + 1/2*|01>
+        // // Rz(PI() / 6.0, register[0]);
+        // H(register[0]);
 
-        // DumpRegister($"dump", register);
+
+        // Ry(ArcSin(Sqrt(3.0)/2.0), register[0]);
+        Ry(2.0 * ArcSin(Sqrt(1.0/3.0)), register[0]);
+        X(register[0]);
+        Controlled H(register[0..0], register[1]);
+        X(register[0]);
+        DumpRegister($"dump", register);
     }
 
 
@@ -326,8 +332,18 @@ namespace Lab3 {
     /// ## register
     /// A three-qubit register in the |000> state.
     operation Challenge2 (register : Qubit[]) : Unit {
-        // TODO
-        fail "Not implemented.";
+        Ry(2.0 * ArcSin(Sqrt(1.0/3.0)), register[0]);
+        X(register[0]);
+        Controlled H(register[0..0], register[1]);
+        X(register[0]);
+        // Challenge2(register);
+        
+        SWAP(register[0], register[2]);
+        X(register[1]);
+        X(register[2]);
+        CCNOT(register[1], register[2], register[0]);
+        X(register[1]);
+        X(register[2]);
     }
 
 
@@ -370,74 +386,55 @@ namespace Lab3 {
     /// faster than classical computers once we get to quantum algorithms, but
     /// this is a good first hint.
     operation Challenge3 (register : Qubit[]) : Unit {
-        // let deg = PI() / 4.0;
-        // Rx(deg, register[0]);
-        
         H(register[0]);
         H(register[1]);
         H(register[2]);
         
-        use helper1 = Qubit[3];
+        use helper1 = Qubit[2];
 
         // tangle helper bit 0 with 000
-        X(register[0]);
-        X(register[1]);
-        X(register[2]);
-        Controlled X(register[0..2], helper1[0]);
-        X(register[2]);
-        X(register[1]);
-        X(register[0]);
- 
-        // H(helper1[2]);
+        ApplyToEach(X, register);
+        Controlled X(register, helper1[0]);
+        ApplyToEach(X, register);
 
         // tangle helper bit 1 with 100
-        X(register[1]);
-        X(register[2]);
-        Controlled X(register[0..2], helper1[1]);
-        X(register[1]);
-        X(register[2]);
+        ApplyToEach(X, register[1 .. 2]);
+        Controlled X(register, helper1[1]);
+        ApplyToEach(X, register[1 .. 2]);
 
         CNOT(helper1[0], register[1]);   // 000 -> 010
         CNOT(helper1[1], register[1]);   // 100 -> 110
-        
-        
-       
-        
+
         DumpMachine($"dump", register);
-        // DumpRegister($"dump", register);
-        ResetAll(helper1);
-        
-        // use helper2 = Qubit[3];
-        // Controlled X(register[0..2], helper2[0]);
-        
-        // X(register[1]);
-        // Controlled Z(register[0..2], helper2[1]);
-        // X(register[1]);
-        
-        // X(register[2]);
-        // Controlled Z(register[0..2], helper2[2]);
-        // X(register[2]);
 
-        // Controlled Z(helper2[0..0], register[0]);
-        // Controlled Z(helper2[1..1], register[0]);
-        // Controlled Z(helper2[2..2], register[0]);
+        // reset helper bits to 0
+        X(register[0]);     // 010 10 -> 010 00
+        X(register[2]);
+        Controlled H(register, helper1[0]);
+        X(register[0]);
+        X(register[2]);
 
-        // DumpMachine($"dump2", register);
-        
-        // H(register[0]);
-        // CNOT(register[0], register[1]);
-        
-        // ResetAll(helper2);
+        X(register[2]);     // 110 01 -> 110 00
+        DumpMachine($"dump", register);
+        Controlled H(register, helper1[1]);
+        X(register[2]);
 
+        DumpMachine($"dump2", register);
+
+        X(register[1]); // 100 -> 110, 101 -> 111
+        Controlled Z(register[0..1], register[2]);
+        X(register[1]);
+        Controlled Z(register[1..1], register[0]);
     }
 
-    operation learn (register : Qubit[]) : Unit {
-        H(register[0]);
-        use helper = Qubit();
-        CNOT(register[0], helper);
-        CNOT(helper, register[0]);
-        // DumpMachine($"Learning", register);
-    }
+    // operation learn (register : Qubit[]) : Unit {
+    //     H(register[0]);
+    //     use helper = Qubit();
+    //     CNOT(register[0], helper);
+    //     CNOT(helper, register[0]);
+    //     // DumpMachine($"Learning", register);
+    //     H(helper);
+    // }
 
     /// # Summary
     /// This problem is the same as Challenge 3, but now you must construct a
@@ -462,7 +459,18 @@ namespace Lab3 {
     /// ## register
     /// A three-qubit register in the |000> state.
     operation Challenge4 (register : Qubit[]) : Unit {
-        // TODO
-        fail "Not implemented.";
+        Challenge3(register);
+
+        X(register[0]);     // 010 -> 000
+        X(register[2]);
+        CCNOT(register[0], register[2], register[1]);
+        X(register[0]);
+        X(register[2]);
+
+        X(register[2]);     // 110 -> 100
+        CCNOT(register[0], register[2], register[1]);
+        X(register[2]);
+
+        Z(register[1]);     // flipping signs
     }
 }
