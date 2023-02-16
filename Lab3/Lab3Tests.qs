@@ -243,15 +243,6 @@ namespace Lab3 {
         AssertAllZero(qubits);
     }
 
-    // @Test("QuantumSimulator")
-    // operation learnTest () : Unit {
-    //     use qubits = Qubit[1];
-    //     learn(qubits);
-    //     DumpMachine($"Learning", qubits);
-    //     // X(qubits[0]);
-    //     AssertAllZero(qubits);
-    //     // ResetAll(qubits);
-    // }
 
     @Test("QuantumSimulator")
     operation Challenge4Test () : Unit {

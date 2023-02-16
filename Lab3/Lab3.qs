@@ -79,10 +79,8 @@ namespace Lab3 {
         let len = Length(register) - 1;
         if (len > 0) {
             let lenHalf = len / 2;
-            // Message($"len (last idx) = {len}, lenhalf = {lenHalf}");
             for i in 0 .. lenHalf {
                 if (i != len - i) {
-                    // Message($"i = {i}, lenhalf = {lenHalf}");
                     SWAP(register[i], register[len - i]);
                 }
             }
@@ -119,16 +117,16 @@ namespace Lab3 {
         // from there.
 
         for reg in registers {
-            H(reg[0]); // 00 + 10
-            CNOT(reg[0], reg[1]); // 00 + 11
+            H(reg[0]);              // 00 + 10
+            CNOT(reg[0], reg[1]);   // 00 + 11
         }
 
-        Z(registers[1][0]);     // 00 - 11
+        Z(registers[1][0]);         // 00 - 11
 
-        X(registers[2][1]);     // 01 + 10
-
-        X(registers[3][1]);     // 01 + 10
-        Z(registers[3][0]);     // 01 - 10
+        X(registers[2][1]);         // 01 + 10
+        
+        X(registers[3][1]);         // 01 + 10
+        Z(registers[3][0]);         // 01 - 10
     }
 
 
@@ -274,7 +272,6 @@ namespace Lab3 {
         CCNOT(register[0], register[1], register[2]);
                                             // 1/√2*|000> + 1/2(|100> - |111>)
         Z(register[0]);
-        
     }
 
 
@@ -298,24 +295,10 @@ namespace Lab3 {
     /// ## register
     /// A two-qubit register in the |00> state.
     operation Challenge1 (register : Qubit[]) : Unit {
-        // H(register[0]);
-        // // X(register[1]);
-        // // CNOT(register[0], register[1]);
-        // // H(register[0]);
-        // H(register[0]);
-        // H(register[0]);                             // 1/√2*|00> + 1/√2*|10>
-        // Controlled H(register[0..0], register[1]);  // 1/√2*|00> + 1/2*|10> + 1/2*|11>
-        // CNOT(register[1], register[0]);             // 1/√2*|00> + 1/2*|10> + 1/2*|01>
-        // // Rz(PI() / 6.0, register[0]);
-        // H(register[0]);
-
-
-        // Ry(ArcSin(Sqrt(3.0)/2.0), register[0]);
         Ry(2.0 * ArcSin(Sqrt(1.0/3.0)), register[0]);
         X(register[0]);
         Controlled H(register[0..0], register[1]);
         X(register[0]);
-        DumpRegister($"dump", register);
     }
 
 
@@ -332,11 +315,7 @@ namespace Lab3 {
     /// ## register
     /// A three-qubit register in the |000> state.
     operation Challenge2 (register : Qubit[]) : Unit {
-        Ry(2.0 * ArcSin(Sqrt(1.0/3.0)), register[0]);
-        X(register[0]);
-        Controlled H(register[0..0], register[1]);
-        X(register[0]);
-        // Challenge2(register);
+        Challenge1(register[0..1]);
         
         SWAP(register[0], register[2]);
         X(register[1]);
@@ -405,36 +384,22 @@ namespace Lab3 {
         CNOT(helper1[0], register[1]);   // 000 -> 010
         CNOT(helper1[1], register[1]);   // 100 -> 110
 
-        DumpMachine($"dump", register);
-
         // reset helper bits to 0
-        X(register[0]);     // 010 10 -> 010 00
+        X(register[0]);                 // 010 10 -> 010 00
         X(register[2]);
         Controlled H(register, helper1[0]);
         X(register[0]);
         X(register[2]);
 
-        X(register[2]);     // 110 01 -> 110 00
-        DumpMachine($"dump", register);
+        X(register[2]);                 // 110 01 -> 110 00
         Controlled H(register, helper1[1]);
         X(register[2]);
 
-        DumpMachine($"dump2", register);
-
-        X(register[1]); // 100 -> 110, 101 -> 111
+        X(register[1]);                 // 100 -> 110, 101 -> 111
         Controlled Z(register[0..1], register[2]);
         X(register[1]);
         Controlled Z(register[1..1], register[0]);
     }
-
-    // operation learn (register : Qubit[]) : Unit {
-    //     H(register[0]);
-    //     use helper = Qubit();
-    //     CNOT(register[0], helper);
-    //     CNOT(helper, register[0]);
-    //     // DumpMachine($"Learning", register);
-    //     H(helper);
-    // }
 
     /// # Summary
     /// This problem is the same as Challenge 3, but now you must construct a
