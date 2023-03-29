@@ -130,30 +130,6 @@ namespace Lab7 {
         apply {
             Exercise2_CheckIfAllZeros(candidateEncryptionKey, target);
         }
-        // let length = Length(encryptedMessage);
-        // mutable correctSoFar = true;
-        // mutable shouldFlip = true;
-        
-        // Exercise1_XOR(originalMessage, candidateEncryptionKey);
-        
-        // use aux_qubits = Qubit[length];
-        // for i in 0 .. length - 1 {
-        //     CNOT(candidateEncryptionKey[i], aux_qubits[i]);
-        // }
-
-        // for i in 0 .. length - 1 {
-        //     let measure = M(aux_qubits[i]);
-        //     set correctSoFar = 
-        //         (encryptedMessage[i] == false and measure == Zero)
-        //         or
-        //         (encryptedMessage[i] == true and measure == One);
-        //     if (not correctSoFar) { set shouldFlip = false; }
-        // }
-        // if (shouldFlip) { Z(target); }
-        
-        // Adjoint Exercise1_XOR(originalMessage, candidateEncryptionKey);
-
-        // ResetAll(aux_qubits);
     }
 
 
@@ -222,14 +198,26 @@ namespace Lab7 {
         // This calculates the number of iterations you should run during the
         // Grover search. It's provided here for your convenience.
         let iterations = Round(PI() / 4.0 * Sqrt(IntAsDouble(numberOfQubits)));
-        
+
         use (qubits, target) = (Qubit[numberOfQubits], Qubit());
         ApplyToEach(H, qubits);
         X(target);
-        for i in 1 .. iterations {
+        for i in 0 .. iterations {
             Exercise4_GroverIteration(oracle, qubits, target); 
         }
-        // TODO
-        fail "Not implemented.";
+
+        mutable results = [false, size=0];
+        let measures = MultiM(qubits);
+        for m in measures {
+            if (m == Zero) {
+                set results += [false];
+            } else {
+                set results += [true];
+            }
+        }
+
+        ResetAll(qubits);
+        Reset(target);
+        return results;
     }
 }
