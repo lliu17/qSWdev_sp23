@@ -107,6 +107,7 @@ namespace Lab8 {
         
 
         let numQubits = Length(register!);
+        swap(register!);
         let res = MultiM(register!);
         DumpRegister((), register!);
         // DumpMachine($"dump_lab8", register!);
