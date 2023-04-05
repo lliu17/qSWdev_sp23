@@ -13,6 +13,7 @@ namespace Lab8 {
     open Microsoft.Quantum.Intrinsic;
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Measurement;
+    open Microsoft.Quantum.Diagnostics;
 
     // from lab3 - exercise 2
     operation swap(register : Qubit[]) : Unit is Adj + Ctl {
@@ -53,6 +54,10 @@ namespace Lab8 {
                 Controlled Microsoft.Quantum.Intrinsic.R1Frac([register![j]], 
                                                     (1, j - i, register![i]));
             }
+            // for j in i + 1 .. len - 1 {
+            //     Controlled Microsoft.Quantum.Intrinsic.R1Frac([register![j]], 
+            //                                         (2, j - i, register![i]));
+            // }
         }
         swap(register!);
     }
@@ -94,9 +99,30 @@ namespace Lab8 {
         register : BigEndian,
         sampleRate : Double
     ) : Double {
+        // ApplyToEach(H, register!);
+        // Adjoint QFT(register);
+        
         Adjoint Exercise1(register);
+
+        
+
+        let numQubits = Length(register!);
         let res = MultiM(register!);
-        let ResultArrayAsInt
-        return 0.0;
+        DumpRegister((), register!);
+        // DumpMachine($"dump_lab8", register!);
+        mutable mea = ResultArrayAsInt(res);
+        
+        
+
+        Message($"sample number is {mea}.");
+        Message($"=== numQubits is {numQubits}.");
+        Message($"sampleRate is {sampleRate}.");
+        
+        if (mea > 2 ^ (numQubits - 1)) {
+            Message("MIRRORING.");
+            set mea = 2 ^ numQubits - mea; 
+            Message($"sample number is {mea}.");
+        }
+        return IntAsDouble(mea) * sampleRate / IntAsDouble(2 ^ numQubits);
     }
 }
