@@ -54,10 +54,6 @@ namespace Lab8 {
                 Controlled Microsoft.Quantum.Intrinsic.R1Frac([register![j]], 
                                                     (1, j - i, register![i]));
             }
-            // for j in i + 1 .. len - 1 {
-            //     Controlled Microsoft.Quantum.Intrinsic.R1Frac([register![j]], 
-            //                                         (2, j - i, register![i]));
-            // }
         }
         swap(register!);
     }
@@ -99,30 +95,13 @@ namespace Lab8 {
         register : BigEndian,
         sampleRate : Double
     ) : Double {
-        // ApplyToEach(H, register!);
-        // Adjoint QFT(register);
-        
         Adjoint Exercise1(register);
-
-        
-
         let numQubits = Length(register!);
-        swap(register!);
+        swap(register!);    //since ResultArrayAsInt uses small Endian
         let res = MultiM(register!);
-        DumpRegister((), register!);
-        // DumpMachine($"dump_lab8", register!);
         mutable mea = ResultArrayAsInt(res);
-        
-        
-
-        Message($"sample number is {mea}.");
-        Message($"=== numQubits is {numQubits}.");
-        Message($"sampleRate is {sampleRate}.");
-        
         if (mea > 2 ^ (numQubits - 1)) {
-            Message("MIRRORING.");
             set mea = 2 ^ numQubits - mea; 
-            Message($"sample number is {mea}.");
         }
         return IntAsDouble(mea) * sampleRate / IntAsDouble(2 ^ numQubits);
     }
