@@ -74,19 +74,14 @@ namespace Lab9 {
         // exponent classically. You can use the
         // Microsoft.Quantum.Arithmetic.MultiplyByModularInteger() function to
         // do an in-place quantum modular multiplication.
-
-        // Message($"\n=== Calling Exercise1_ModExp on: a = {a}, b = {b}");
         X(output[Length(output) - 1]);
 
         let inputSize = Length(input);
-        // Message($"inputSize = {inputSize}");
         for i in inputSize - 1..-1..0 {
-            let powerOfTwo = inputSize - 1 - i;	// n-i-1
-            let powerOfGuess = 2 ^ powerOfTwo;	// 2^(n-i-1)
-            let constant = ExpModI(a, powerOfGuess, b);	// c = A^(2^(n-i-1)) mod B
-            // Message($"i = {i}, powerOfTwo = {powerOfTwo}, powerOfGuess = {powerOfGuess}, constant = {constant}");
+            let exponent = inputSize - 1 - i;
+            let expo_mod = ExpModI(a, 2 ^ exponent, b);
             Controlled Microsoft.Quantum.Arithmetic.MultiplyByModularInteger
-                ([input[i]], (constant, b, LittleEndian(output)));
+                ([input[i]], (expo_mod, b, LittleEndian(output)));
         }
     }
 
@@ -131,25 +126,17 @@ namespace Lab9 {
         // you do, run the test again. Also, look at the output of the test to
         // see what values you came up with versus what the system expects.
 
-        // let numQubits = 2 * Ceiling(Lg(IntAsDouble(numberToFactor)));
-        // use (input, output) = (Qubit[numQubits], Qubit[numQubits]);
         let outputSize = Ceiling(Lg(IntAsDouble(numberToFactor + 1)));
         use (input, output) = (Qubit[outputSize * 2], Qubit[outputSize]);
         ApplyToEach(H, input);
-        // Message("00 here");
-        // Message($"=== About to call Exercise1_ModExp on: guess = {guess}, numberToFactor = {numberToFactor}");
-        Exercise1_ModExp(guess, numberToFactor, input, output); // << THIS LINE
+
+        Exercise1_ModExp(guess, numberToFactor, input, output);
         Adjoint Lab8_QFT(BigEndian(input));
-        // let measure0 = MeasureInteger(LittleEndian(input));
-        // Lab3_swap(input);
         Lab3_swap(input);
         let res = MultiM(input);
         mutable measure = ResultArrayAsInt(res);
-
-        // let measure = MeasureInteger(LittleEndian(input));
-        // Message($"measure = {measure}");
         ResetAll(input + output);
-        // Message("22 here");
+
         return (measure, 2 ^ (outputSize*2));
     }
 
@@ -196,13 +183,11 @@ namespace Lab9 {
         mutable d = 0;
         mutable r = p % q;
 
-        // Message("\n===");
         while (d < denominatorThreshold and r != 0) {
             set r = p % q;
             mutable a = p / q;
             let m = a * m_minus_1 + m_minus_2;
             set d = a * d_minus_1 + d_minus_2;
-            // Message($"p = {p}, q = {q}, a = {a}, r = {r}, m = {m}, d = {d}");
             if (r == 0) {
                 if (d_minus_1 != 1) {
                     return (m_minus_1, d_minus_1);
