@@ -75,30 +75,19 @@ namespace Lab9 {
         // Microsoft.Quantum.Arithmetic.MultiplyByModularInteger() function to
         // do an in-place quantum modular multiplication.
 
-        // SwapReverseRegister(input); //since ResultArrayAsInt uses small Endian
-        // let measure = MultiM(input);
-        // let x = ResultArrayAsInt(measure);
-        // let res = Microsoft.Quantum.Math.ExpModI(a, x, b);  // o = a^x mod b
-        // SwapReverseRegister(input); // put it back
+        // Message($"\n=== Calling Exercise1_ModExp on: a = {a}, b = {b}");
+        X(output[Length(output) - 1]);
 
-        // Copy(input, output);
-        X(output[Length(output) - 1]);  // set output to 1
-        // let outputAsLE = LittleEndian(output);
-   
         let inputSize = Length(input);
+        // Message($"inputSize = {inputSize}");
         for i in inputSize - 1..-1..0 {
             let powerOfTwo = inputSize - 1 - i;	// n-i-1
             let powerOfGuess = 2 ^ powerOfTwo;	// 2^(n-i-1)
             let constant = ExpModI(a, powerOfGuess, b);	// c = A^(2^(n-i-1)) mod B
+            // Message($"i = {i}, powerOfTwo = {powerOfTwo}, powerOfGuess = {powerOfGuess}, constant = {constant}");
             Controlled Microsoft.Quantum.Arithmetic.MultiplyByModularInteger
                 ([input[i]], (constant, b, LittleEndian(output)));
         }
-        // SwapReverseRegister(output);
-        // ResetAll(input);
-        // mutable multiplier = a;
-        // for i in 0 .. x - 1 {
-        //     Microsoft.Quantum.Arithmetic.MultiplyByModularInteger(a, b, LittleEndian(output));
-        // }
     }
 
 
@@ -142,16 +131,26 @@ namespace Lab9 {
         // you do, run the test again. Also, look at the output of the test to
         // see what values you came up with versus what the system expects.
 
-        let numQubits = Ceiling(IntAsDouble(2) * Lg(IntAsDouble(numberToFactor)));
-        
-        use (input, output) = (Qubit[numQubits], Qubit[numQubits]);
+        // let numQubits = 2 * Ceiling(Lg(IntAsDouble(numberToFactor)));
+        // use (input, output) = (Qubit[numQubits], Qubit[numQubits]);
+        let outputSize = Ceiling(Lg(IntAsDouble(numberToFactor + 1)));
+        use (input, output) = (Qubit[outputSize * 2], Qubit[outputSize]);
         ApplyToEach(H, input);
-        // Exercise1_ModExp(guess, numberToFactor, input, output); // << THIS LINE
+        // Message("00 here");
+        // Message($"=== About to call Exercise1_ModExp on: guess = {guess}, numberToFactor = {numberToFactor}");
+        Exercise1_ModExp(guess, numberToFactor, input, output); // << THIS LINE
         Adjoint Lab8_QFT(BigEndian(input));
-        let measure = MeasureInteger(LittleEndian(input));
+        // let measure0 = MeasureInteger(LittleEndian(input));
+        // Lab3_swap(input);
+        Lab3_swap(input);
+        let res = MultiM(input);
+        mutable measure = ResultArrayAsInt(res);
+
+        // let measure = MeasureInteger(LittleEndian(input));
+        // Message($"measure = {measure}");
         ResetAll(input + output);
-        // return (measure, 2 ^ numQubits);
-        return (1, 2);
+        // Message("22 here");
+        return (measure, 2 ^ (outputSize*2));
     }
 
 
@@ -183,43 +182,35 @@ namespace Lab9 {
         denominator : Int,
         denominatorThreshold : Int
     ) : (Int, Int) {
+        
         if (numerator == 0) {
             return (0, 1);
         }
-
         // set up variables outside the loop
         mutable p = numerator;
         mutable q = denominator;
-        mutable first_two_rows = true;
         mutable m_minus_2 = 0;
-        mutable d_minus_2 = 0;
-        mutable m_minus_1 = 0;
+        mutable m_minus_1 = 1;
+        mutable d_minus_2 = 1;
         mutable d_minus_1 = 0;
         mutable d = 0;
+        mutable r = p % q;
 
-        while (d < denominatorThreshold) {
-            mutable r = p % q;
+        // Message("\n===");
+        while (d < denominatorThreshold and r != 0) {
+            set r = p % q;
             mutable a = p / q;
-            
-            if (first_two_rows) {
-                set m_minus_2 = a;
-                set d_minus_2 = 1;
-                Message($"p = {p}, q = {q}, a = {a}, r = {r}");
-                set p = q;
-                set q = r;
-                set r = p % q;
-                set a = p / q;
-                
-                set m_minus_1 = 1;
-                set d_minus_1 = a;
-                set p = q;
-                set q = r;
-                set first_two_rows = false;
-            }
             let m = a * m_minus_1 + m_minus_2;
             set d = a * d_minus_1 + d_minus_2;
-            Message($"m = {m}, d = {d}\n");
-            
+            // Message($"p = {p}, q = {q}, a = {a}, r = {r}, m = {m}, d = {d}");
+            if (r == 0) {
+                if (d_minus_1 != 1) {
+                    return (m_minus_1, d_minus_1);
+                }
+                else {
+                    return (m, d);
+                }
+            }
             set p = q;
             set q = r;
             set m_minus_2 = m_minus_1;
@@ -227,7 +218,7 @@ namespace Lab9 {
             set d_minus_2 = d_minus_1;
             set d_minus_1 = d;
         }
-        return (m_minus_1, d_minus_1);
+        return (m_minus_2, d_minus_2);
     }
 
 
@@ -261,8 +252,20 @@ namespace Lab9 {
         // Microsoft.Quantum.Math.GreatestCommonDivisorI()
         // function to calculate the GCD of two numbers.
 
-        // TODO
-        fail "Not implemented.";
+        mutable found = false;
+        mutable res = 0;
+        repeat {
+            let (nume, deno) = Exercise2_FindApproxPeriod(numberToFactor, guess);
+            let (_, p) = Exercise3_FindPeriodCandidate(nume, deno, numberToFactor);
+            if (guess ^ p % numberToFactor == 1) { 
+                set found = true; 
+                set res = p;
+            }
+        }
+        until found;
+        Message($"res = {res}");
+        if (res == 0) { fail "res = 0"; }
+        return res;
     }
 
 
@@ -294,7 +297,17 @@ namespace Lab9 {
         guess : Int,
         period : Int
     ) : Int {
-        // TODO
-        fail "Not implemented.";
+        if (period % 2 == 1) { return -1; }
+        if ((guess ^ (period/2) + 1) % numberToFactor == 0) { return -2; }
+        
+        let candidate1 = (guess ^ (period/2) + 1);
+        mutable gcd = GreatestCommonDivisorI(candidate1, numberToFactor);
+        if (gcd != 1) { return gcd; }
+
+        let candidate2 = (guess ^ (period/2) - 1);
+        set gcd = GreatestCommonDivisorI(candidate2, numberToFactor);
+        if (gcd != 1) { return gcd; }
+
+        return -2;
     }
 }
